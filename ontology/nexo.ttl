@@ -1,0 +1,1056 @@
+@prefix nexo: <http://modultech.eu/nexo/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix time: <http://www.w3.org/2006/time#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+# ============================================
+# ONTOLOGY METADATA
+# ============================================
+<http://modultech.eu/nexo/> a owl:Ontology ;
+    rdfs:label "NEXO: Narrative Event eXtraction Ontology"@en ;
+    owl:versionInfo "1.2" ;
+    rdfs:comment """An ontology for modeling both simple scheduled events (concerts, exhibitions, conferences) 
+    and complex unscheduled societal phenomena (social movements, pandemics, conflicts, natural disasters).
+    NEXO focuses on Earth-based events across domains including:
+    - Cultural events (exhibitions, concerts, performances)
+    - Sports events (matches, races, tournaments, marathons)
+    - Criminal incidents (shootings, stabbings, assaults)
+    - Armed conflicts (wars, battles, military operations)
+    - Social movements (protests, civil rights movements)
+    - Public health crises (pandemics, epidemics, outbreaks)
+    - Environmental events (natural disasters AND human-caused)
+    - Financial events (market crashes, IPOs, bankruptcies, M&A)
+    - Conference events (scientific, business, political summits)
+    - Life events (deaths, obituaries of notable people)
+    - Legal/judicial events (trials, verdicts, court decisions)
+    - Accidents (transportation, industrial, non-criminal)
+    - Technology events (product launches, software releases)
+    - Recognition events (awards, honors, prizes)
+    - Electoral events (elections, referendums)
+    - Diplomatic events (treaties, agreements, accords)
+    Design Principles:
+    1. Minimal commitment - allows underspecification
+    2. Event granularity - supports atomic and composite events
+    3. Temporal flexibility - handles both precise dates and fuzzy periods
+    4. Multiple perspectives - accounts for contested interpretations
+    5. Emergence - captures how events develop and evolve
+    6. Causality - natural vs. human-caused distinction
+    7. Earth-centric - designed for terrestrial events (extensible to space)"""@en ;
+    rdfs:seeAlso <https://github.com/nexo-ontology/nexo> ;
+    owl:versionIRI <http://modultech.eu/nexo/1.2/> ;
+    vann:preferredNamespacePrefix "nexo" ;
+    vann:preferredNamespaceUri "http://modultech.eu/nexo/" ;
+    dcterms:title "NEXO: Narrative Event eXtraction Ontology"@en ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcterms:issued "2023-01-01"^^xsd:date ;
+    dcterms:modified "2026-08-24"^^xsd:date ;
+    dcterms:publisher [ a foaf:Organization ;
+        foaf:name "MODUL Technology GmbH" ] ;
+    dcterms:abstract """NEXO models events as they are reported in narrative
+    text. It covers eighteen domain families and provides a shared spine for
+    temporality, spatiality, participation, causality, composition and
+    perspective, so that domain branches specialise a single event model rather
+    than each inventing their own.
+
+    Version 1.2 adds Mobility and Legislative branches, refines the cultural and
+    sports branches, widens several ranges to admit the unnormalised surface
+    forms that text extraction actually yields, and repairs classes that v1.1
+    declared but left unreachable. Corpus-specific bindings live in optional
+    modules; the core has no dependency on any particular dataset."""@en ;
+    rdfs:isDefinedBy <http://modultech.eu/nexo/> .
+# ============================================
+# CORE EVENT CLASSES
+# ============================================
+nexo:Event a owl:Class ;
+    rdfs:label "Event"@en ;
+    rdfs:comment "Something that happens or is regarded as happening. The fundamental unit of change or occurrence."@en .
+nexo:SimpleEvent a owl:Class ;
+    rdfs:subClassOf nexo:Event ;
+    rdfs:label "Simple Event"@en ;
+    rdfs:comment "An atomic event with clear temporal and spatial boundaries, typically scheduled or instantaneous."@en ;
+    skos:example "A concert performance, a wedding, a scientific conference, a single stock trade"@en .
+nexo:ComplexEvent a owl:Class ;
+    rdfs:subClassOf nexo:Event ;
+    rdfs:label "Complex Event"@en ;
+    rdfs:comment "An event composed of multiple sub-events, often emergent, with fuzzy boundaries and evolving characteristics."@en ;
+    skos:example "A social movement, a pandemic, a revolution, a war, a financial crisis, a hurricane"@en .
+nexo:ProcessEvent a owl:Class ;
+    rdfs:subClassOf nexo:ComplexEvent ;
+    rdfs:label "Process Event"@en ;
+    rdfs:comment "An extended event characterized by gradual change or continuous activity over time."@en ;
+    skos:example "Climate change, gentrification, political polarization, economic recession"@en .
+nexo:EpisodicEvent a owl:Class ;
+    rdfs:subClassOf nexo:ComplexEvent ;
+    rdfs:label "Episodic Event"@en ;
+    rdfs:comment "A complex event manifesting through discrete episodes or phases."@en ;
+    skos:example "A protest movement with rallies, the COVID-19 pandemic with waves, wildfire seasons"@en .
+# ============================================
+# EVENT COMPONENTS
+# ============================================
+nexo:SubEvent a owl:Class ;
+    rdfs:label "Sub-Event"@en ;
+    rdfs:comment "A component event that is part of a larger event."@en .
+nexo:Trigger a owl:Class ;
+    rdfs:label "Trigger"@en ;
+    rdfs:comment "A catalyzing event that initiates or significantly accelerates a complex event."@en ;
+    skos:example "George Floyd's murder as trigger for 2020 BLM protests, Lehman Brothers collapse triggering 2008 financial crisis"@en .
+nexo:Phase a owl:Class ;
+    rdfs:label "Phase"@en ;
+    rdfs:comment "A distinct stage or period within a complex event's evolution."@en .
+# ============================================
+# PARTICIPANTS & ROLES
+# ============================================
+nexo:Participant a owl:Class ;
+    rdfs:label "Participant"@en ;
+    rdfs:comment "An entity (person, organization, group) involved in an event."@en .
+nexo:Agent a owl:Class ;
+    rdfs:subClassOf nexo:Participant ;
+    rdfs:label "Agent"@en ;
+    rdfs:comment "A participant with agency - actively performing actions."@en .
+nexo:Patient a owl:Class ;
+    rdfs:subClassOf nexo:Participant ;
+    rdfs:label "Patient"@en ;
+    rdfs:comment "A participant affected by the event."@en .
+nexo:CollectiveAgent a owl:Class ;
+    rdfs:subClassOf nexo:Agent ;
+    rdfs:label "Collective Agent"@en ;
+    rdfs:comment "A group acting as an agent, possibly decentralized or emergent."@en ;
+    skos:example "Black Lives Matter movement, Anonymous collective, market traders"@en .
+nexo:Role a owl:Class ;
+    rdfs:label "Role"@en ;
+    rdfs:comment "A function or position a participant holds in an event."@en .
+# ============================================
+# TEMPORAL PROPERTIES
+# ============================================
+nexo:TemporalExtent a owl:Class ;
+    rdfs:label "Temporal Extent"@en ;
+    rdfs:comment "The temporal span of an event, which may be precise, fuzzy, or ongoing."@en .
+nexo:PreciseInterval a owl:Class ;
+    rdfs:subClassOf nexo:TemporalExtent ;
+    rdfs:label "Precise Interval"@en ;
+    rdfs:comment "A temporal extent with definite start and end points."@en .
+nexo:FuzzyInterval a owl:Class ;
+    rdfs:subClassOf nexo:TemporalExtent ;
+    rdfs:label "Fuzzy Interval"@en ;
+    rdfs:comment "A temporal extent with approximate or contested boundaries."@en .
+nexo:OngoingInterval a owl:Class ;
+    rdfs:subClassOf nexo:TemporalExtent ;
+    rdfs:label "Ongoing Interval"@en ;
+    rdfs:comment "A temporal extent that has begun but not yet concluded."@en .
+# ============================================
+# SPATIAL PROPERTIES
+# ============================================
+nexo:SpatialExtent a owl:Class ;
+    rdfs:label "Spatial Extent"@en ;
+    rdfs:comment "The spatial scope of an event on Earth (or potentially beyond)."@en .
+nexo:Location a owl:Class ;
+    rdfs:label "Location"@en ;
+    rdfs:comment "A specific place where an event occurs."@en .
+nexo:Region a owl:Class ;
+    rdfs:label "Region"@en ;
+    rdfs:comment "An area encompassing multiple locations."@en .
+nexo:DistributedSpace a owl:Class ;
+    rdfs:label "Distributed Space"@en ;
+    rdfs:comment "A non-contiguous spatial extent, potentially global or networked."@en ;
+    skos:example "Social media space, decentralized protest locations, global financial markets"@en .
+nexo:Planet a owl:Class ;
+    rdfs:label "Planet"@en ;
+    rdfs:comment "A planetary body where events occur. NEXO v1.0 focuses on Earth, extensible to other planets."@en ;
+    skos:example "Earth, Mars (future extension)"@en .
+# ============================================
+# EVENT CHARACTERISTICS
+# ============================================
+nexo:EventType a owl:Class ;
+    rdfs:label "Event Type"@en ;
+    rdfs:comment "A classification or category of event."@en .
+nexo:Impact a owl:Class ;
+    rdfs:label "Impact"@en ;
+    rdfs:comment "An effect or consequence of an event."@en .
+nexo:Magnitude a owl:Class ;
+    rdfs:label "Magnitude"@en ;
+    rdfs:comment "A measure of event scale or intensity."@en .
+nexo:Perspective a owl:Class ;
+    rdfs:label "Perspective"@en ;
+    rdfs:comment "A particular viewpoint or interpretation of an event."@en .
+# ============================================
+# CAUSALITY CLASSIFICATION
+# ============================================
+nexo:Causality a owl:Class ;
+    rdfs:label "Causality"@en ;
+    rdfs:comment "The causal origin of an event: natural, human-caused, or mixed."@en .
+nexo:NaturalCause a owl:Class ;
+    rdfs:subClassOf nexo:Causality ;
+    rdfs:label "Natural Cause"@en ;
+    rdfs:comment "Events caused by natural processes without human agency."@en ;
+    skos:example "Earthquake, volcanic eruption, lightning-caused wildfire"@en .
+nexo:AnthropogenicCause a owl:Class ;
+    rdfs:subClassOf nexo:Causality ;
+    rdfs:label "Anthropogenic Cause"@en ;
+    rdfs:comment "Events caused by human action or inaction."@en ;
+    skos:example "Oil spill, arson, industrial accident"@en .
+nexo:MixedCause a owl:Class ;
+    rdfs:subClassOf nexo:Causality ;
+    rdfs:label "Mixed Cause"@en ;
+    rdfs:comment "Events resulting from both natural and human factors."@en ;
+    skos:example "Hurricane made worse by climate change, landslide triggered by deforestation"@en .
+# ============================================
+# OBJECT PROPERTIES
+# ============================================
+nexo:hasParticipant a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Participant ;
+    rdfs:label "has participant"@en .
+nexo:hasAgent a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasParticipant ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Agent ;
+    rdfs:label "has agent"@en .
+nexo:hasPatient a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasParticipant ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Patient ;
+    rdfs:label "has patient"@en .
+nexo:hasSubEvent a owl:ObjectProperty ;
+    rdfs:domain nexo:ComplexEvent ;
+    rdfs:range nexo:Event ;
+    rdfs:label "has sub-event"@en .
+nexo:partOf a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:ComplexEvent ;
+    rdfs:label "part of"@en ;
+    owl:inverseOf nexo:hasSubEvent .
+nexo:triggers a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Event ;
+    rdfs:label "triggers"@en ;
+    rdfs:comment "Indicates that one event catalyzes or causes another event."@en .
+nexo:causedBy a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Event ;
+    rdfs:label "caused by"@en ;
+    owl:inverseOf nexo:triggers .
+nexo:precedes a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Event ;
+    rdfs:label "precedes"@en ;
+    rdfs:comment "Temporal ordering relation between events."@en .
+nexo:follows a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Event ;
+    rdfs:label "follows"@en ;
+    owl:inverseOf nexo:precedes .
+nexo:hasTemporalExtent a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:TemporalExtent ;
+    rdfs:label "has temporal extent"@en .
+nexo:hasSpatialExtent a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:SpatialExtent ;
+    rdfs:label "has spatial extent"@en .
+nexo:hasLocation a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Location ;
+    rdfs:label "has location"@en .
+nexo:occursIn a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Region ;
+    rdfs:label "occurs in"@en .
+nexo:hasImpact a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Impact ;
+    rdfs:label "has impact"@en .
+nexo:hasCausality a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Causality ;
+    rdfs:label "has causality"@en .
+nexo:hasPhase a owl:ObjectProperty ;
+    rdfs:domain nexo:ComplexEvent ;
+    rdfs:range nexo:Phase ;
+    rdfs:label "has phase"@en .
+nexo:onPlanet a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Planet ;
+    rdfs:label "on planet"@en ;
+    rdfs:comment "Specifies which planet the event occurs on. Default is Earth."@en .
+# ============================================
+# DATATYPE PROPERTIES
+# ============================================
+nexo:startDate a owl:DatatypeProperty ;
+    rdfs:label "start date"@en .
+nexo:endDate a owl:DatatypeProperty ;
+    rdfs:label "end date"@en .
+nexo:approximateStart a owl:DatatypeProperty ;
+    rdfs:domain nexo:FuzzyInterval ;
+    rdfs:range xsd:string ;
+    rdfs:label "approximate start"@en ;
+    rdfs:comment "For fuzzy temporal boundaries like 'late 2019' or 'spring 2020'"@en .
+nexo:approximateEnd a owl:DatatypeProperty ;
+    rdfs:domain nexo:FuzzyInterval ;
+    rdfs:range xsd:string ;
+    rdfs:label "approximate end"@en .
+nexo:isOngoing a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "is ongoing"@en .
+nexo:eventName a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range rdfs:Literal ;
+    rdfs:label "event name"@en ;
+    rdfs:comment "Range is rdfs:Literal to permit language-tagged names."@en .
+nexo:description a owl:DatatypeProperty ;
+    rdfs:domain owl:Thing ;
+    rdfs:range rdfs:Literal ;
+    rdfs:label "description"@en ;
+    rdfs:comment """Range is rdfs:Literal rather than xsd:string so that free text
+    can carry a language tag. Fixing it to xsd:string would make language-tagged
+    descriptions ill-typed, which is untenable for a multilingual corpus."""@en .
+nexo:estimatedParticipants a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range xsd:integer ;
+    rdfs:label "estimated participants"@en .
+nexo:casualties a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range xsd:integer ;
+    rdfs:label "casualties"@en .
+nexo:affectedPopulation a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range xsd:integer ;
+    rdfs:label "affected population"@en .
+nexo:economicImpact a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "economic impact"@en ;
+    rdfs:comment "Economic impact in monetary terms"@en .
+nexo:coordinatesWGS84 a owl:DatatypeProperty ;
+    rdfs:domain nexo:Location ;
+    rdfs:range xsd:string ;
+    rdfs:label "coordinates (WGS84)"@en ;
+    rdfs:comment "Geographic coordinates in WGS84 format (latitude,longitude)"@en .
+nexo:intensity a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "intensity"@en ;
+    rdfs:comment "A normalized measure of event intensity (0-1 scale)"@en .
+nexo:magnitude a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "magnitude"@en ;
+    rdfs:comment "Magnitude measure (e.g., Richter scale for earthquakes, market percentage for crashes)"@en .
+# ============================================
+# SPECIFIC EVENT TYPE CLASSES
+# ============================================
+# Cultural Events
+nexo:CulturalEvent a owl:Class ;
+    rdfs:subClassOf nexo:SimpleEvent ;
+    rdfs:label "Cultural Event"@en ;
+    skos:example "Exhibition, concert, theater performance"@en .
+# Sports Events
+nexo:SportsEvent a owl:Class ;
+    rdfs:subClassOf nexo:SimpleEvent ;
+    rdfs:label "Sports Event"@en ;
+    skos:example "Football match, marathon, tennis final"@en .
+# Criminal Events
+nexo:CriminalIncident a owl:Class ;
+    rdfs:subClassOf nexo:SimpleEvent ;
+    rdfs:label "Criminal Incident"@en ;
+    skos:example "Shooting, stabbing, robbery"@en .
+# Conflict Events
+nexo:ArmedConflict a owl:Class ;
+    rdfs:subClassOf nexo:ComplexEvent ;
+    rdfs:label "Armed Conflict"@en ;
+    skos:example "War, military operation, battle"@en .
+# Social Movement Events
+nexo:SocialMovement a owl:Class ;
+    rdfs:subClassOf nexo:ComplexEvent ;
+    rdfs:label "Social Movement"@en ;
+    skos:example "Civil rights movement, protest movement"@en .
+# Public Health Events
+nexo:PublicHealthCrisis a owl:Class ;
+    rdfs:subClassOf nexo:ComplexEvent ;
+    rdfs:label "Public Health Crisis"@en ;
+    skos:example "Pandemic, epidemic, outbreak"@en .
+# Environmental Events
+nexo:EnvironmentalEvent a owl:Class ;
+    rdfs:subClassOf nexo:Event ;
+    rdfs:label "Environmental Event"@en ;
+    rdfs:comment "Events affecting the natural environment, can be natural or anthropogenic"@en .
+nexo:NaturalDisaster a owl:Class ;
+    rdfs:subClassOf nexo:EnvironmentalEvent, nexo:ComplexEvent ;
+    rdfs:label "Natural Disaster"@en ;
+    rdfs:comment "Natural catastrophic events"@en ;
+    skos:example "Earthquake, hurricane, tsunami, volcanic eruption, wildfire (natural)"@en .
+nexo:AnthropogenicEnvironmentalEvent a owl:Class ;
+    rdfs:subClassOf nexo:EnvironmentalEvent ;
+    rdfs:label "Anthropogenic Environmental Event"@en ;
+    rdfs:comment "Environmental events caused by human activity"@en ;
+    skos:example "Oil spill, industrial accident, human-caused wildfire, deforestation event"@en .
+# Financial Events
+nexo:FinancialEvent a owl:Class ;
+    rdfs:subClassOf nexo:Event ;
+    rdfs:label "Financial Event"@en ;
+    rdfs:comment "Events in financial markets and business"@en .
+nexo:MarketEvent a owl:Class ;
+    rdfs:subClassOf nexo:FinancialEvent ;
+    rdfs:label "Market Event"@en ;
+    rdfs:comment "Stock market movements, crashes, rallies"@en ;
+    skos:example "Market crash, bull run, trading halt"@en .
+nexo:CorporateEvent a owl:Class ;
+    rdfs:subClassOf nexo:FinancialEvent ;
+    rdfs:label "Corporate Event"@en ;
+    rdfs:comment "Business events like IPOs, mergers, bankruptcies"@en ;
+    skos:example "IPO, merger & acquisition, bankruptcy filing, earnings announcement"@en .
+# Conference Events
+nexo:ConferenceEvent a owl:Class ;
+    rdfs:subClassOf nexo:SimpleEvent ;
+    rdfs:label "Conference Event"@en ;
+    rdfs:comment "Organized meetings, conferences, summits"@en ;
+    skos:example "Scientific conference, business summit, political summit, symposium"@en .
+# Career/Position Events
+nexo:CareerEvent a owl:Class ;
+    rdfs:subClassOf nexo:SimpleEvent ;
+    rdfs:label "Career Event"@en ;
+    rdfs:comment "Events involving career transitions, appointments, resignations"@en ;
+    skos:example "Political appointment, corporate promotion, resignation, retirement"@en .
+nexo:PoliticalAppointment a owl:Class ;
+    rdfs:subClassOf nexo:CareerEvent ;
+    rdfs:label "Political Appointment"@en ;
+    rdfs:comment "Appointment to political office or government position"@en ;
+    skos:example "Presidential appointment, ministerial appointment, cabinet position"@en .
+nexo:CorporateAppointment a owl:Class ;
+    rdfs:subClassOf nexo:CareerEvent ;
+    rdfs:label "Corporate Appointment"@en ;
+    rdfs:comment "Appointment to corporate executive position"@en ;
+    skos:example "CEO appointment, CFO promotion, board member election"@en .
+# Geopolitical Events
+nexo:GeopoliticalEvent a owl:Class ;
+    rdfs:subClassOf nexo:Event ;
+    rdfs:label "Geopolitical Event"@en ;
+    rdfs:comment "Events affecting political boundaries, sovereignty, or state existence"@en .
+nexo:StateFormation a owl:Class ;
+    rdfs:subClassOf nexo:GeopoliticalEvent, nexo:ComplexEvent ;
+    rdfs:label "State Formation"@en ;
+    rdfs:comment "Creation of a new sovereign state or country"@en ;
+    skos:example "Israeli independence 1948, Czechoslovakia independence 1918, South Sudan independence 2011"@en .
+nexo:StateDissolution a owl:Class ;
+    rdfs:subClassOf nexo:GeopoliticalEvent, nexo:ComplexEvent ;
+    rdfs:label "State Dissolution"@en ;
+    rdfs:comment "Breakup or dissolution of a sovereign state"@en ;
+    skos:example "USSR dissolution 1991, Yugoslavia breakup 1991-1992, Czechoslovakia split 1993"@en .
+nexo:Secession a owl:Class ;
+    rdfs:subClassOf nexo:GeopoliticalEvent ;
+    rdfs:label "Secession"@en ;
+    rdfs:comment "Territory separating from a state to form new entity"@en ;
+    skos:example "South Sudan from Sudan 2011, Singapore from Malaysia 1965"@en .
+nexo:Unification a owl:Class ;
+    rdfs:subClassOf nexo:GeopoliticalEvent, nexo:ComplexEvent ;
+    rdfs:label "Unification"@en ;
+    rdfs:comment "Multiple states merging into single entity"@en ;
+    skos:example "German reunification 1990, Italian unification 1861, Vietnam unification 1976"@en .
+nexo:TerritorialChange a owl:Class ;
+    rdfs:subClassOf nexo:GeopoliticalEvent ;
+    rdfs:label "Territorial Change"@en ;
+    rdfs:comment "Change in territorial boundaries or sovereignty"@en ;
+    skos:example "Annexation, cession, border adjustment"@en .
+# Unified Geopolitical State Event
+nexo:GeopoliticalStateEvent a owl:Class ;
+    rdfs:subClassOf nexo:GeopoliticalEvent, nexo:ComplexEvent ;
+    rdfs:label "Geopolitical State Event"@en ;
+    rdfs:comment "Unified class for state formation, dissolution, city expansion, and territorial changes"@en ;
+    skos:example "State formation, state dissolution, city expansion, boundary changes, unification"@en .
+# Life Events
+nexo:LifeEvent a owl:Class ;
+    rdfs:subClassOf nexo:SimpleEvent ;
+    rdfs:label "Life Event"@en ;
+    rdfs:comment "Significant events in a person's life cycle"@en ;
+    skos:example "Birth, death, marriage"@en .
+nexo:Death a owl:Class ;
+    rdfs:subClassOf nexo:LifeEvent ;
+    rdfs:label "Death"@en ;
+    rdfs:comment "Natural death of a person, particularly notable individuals"@en ;
+    skos:example "Death of public figures, politicians, celebrities, monarchs"@en .
+nexo:Obituary a owl:Class ;
+    rdfs:subClassOf nexo:LifeEvent ;
+    rdfs:label "Obituary"@en ;
+    rdfs:comment "Public announcement and commemoration of a person's death"@en .
+# Legal Events
+nexo:LegalEvent a owl:Class ;
+    rdfs:subClassOf nexo:Event ;
+    rdfs:label "Legal Event"@en ;
+    rdfs:comment "Events within legal and judicial systems"@en .
+nexo:Trial a owl:Class ;
+    rdfs:subClassOf nexo:LegalEvent, nexo:ComplexEvent ;
+    rdfs:label "Trial"@en ;
+    rdfs:comment "Legal proceedings in a court of law"@en ;
+    skos:example "Criminal trial, civil trial, tribunal proceedings"@en .
+nexo:Verdict a owl:Class ;
+    rdfs:subClassOf nexo:LegalEvent, nexo:SimpleEvent ;
+    rdfs:label "Verdict"@en ;
+    rdfs:comment "Court decision or ruling on a case"@en ;
+    skos:example "Guilty verdict, acquittal, conviction, judgment"@en .
+nexo:JudicialRuling a owl:Class ;
+    rdfs:subClassOf nexo:LegalEvent, nexo:SimpleEvent ;
+    rdfs:label "Judicial Ruling"@en ;
+    rdfs:comment "Legal ruling or court decision, particularly landmark decisions"@en ;
+    skos:example "Supreme Court decision, appellate ruling, constitutional interpretation"@en .
+nexo:Sentencing a owl:Class ;
+    rdfs:subClassOf nexo:LegalEvent, nexo:SimpleEvent ;
+    rdfs:label "Sentencing"@en ;
+    rdfs:comment "Pronouncement of judicial punishment or penalty"@en .
+# Accidents
+nexo:Accident a owl:Class ;
+    rdfs:subClassOf nexo:SimpleEvent ;
+    rdfs:label "Accident"@en ;
+    rdfs:comment "Unintended harmful events, typically non-criminal"@en .
+nexo:TransportationAccident a owl:Class ;
+    rdfs:subClassOf nexo:Accident ;
+    rdfs:label "Transportation Accident"@en ;
+    rdfs:comment "Accidents involving transportation vehicles"@en ;
+    skos:example "Plane crash, train derailment, ship sinking"@en .
+nexo:AviationAccident a owl:Class ;
+    rdfs:subClassOf nexo:TransportationAccident ;
+    rdfs:label "Aviation Accident"@en ;
+    rdfs:comment "Aircraft accidents and crashes"@en ;
+    skos:example "Plane crash, helicopter accident, mid-air collision"@en .
+nexo:MaritimeAccident a owl:Class ;
+    rdfs:subClassOf nexo:TransportationAccident ;
+    rdfs:label "Maritime Accident"@en ;
+    rdfs:comment "Ship and boat accidents"@en ;
+    skos:example "Ship sinking, collision at sea, grounding"@en .
+nexo:RailAccident a owl:Class ;
+    rdfs:subClassOf nexo:TransportationAccident ;
+    rdfs:label "Rail Accident"@en ;
+    rdfs:comment "Train and railway accidents"@en ;
+    skos:example "Train derailment, railway collision"@en .
+nexo:IndustrialAccident a owl:Class ;
+    rdfs:subClassOf nexo:Accident ;
+    rdfs:label "Industrial Accident"@en ;
+    rdfs:comment "Accidents in industrial settings, excluding environmental disasters"@en ;
+    skos:example "Factory accident, construction accident, workplace injury"@en .
+# Technology Events
+nexo:TechnologyEvent a owl:Class ;
+    rdfs:subClassOf nexo:SimpleEvent ;
+    rdfs:label "Technology Event"@en ;
+    rdfs:comment "Events related to technology development and releases"@en .
+nexo:ProductLaunch a owl:Class ;
+    rdfs:subClassOf nexo:TechnologyEvent ;
+    rdfs:label "Product Launch"@en ;
+    rdfs:comment "Public release or announcement of a new product"@en ;
+    skos:example "iPhone announcement, new car model launch, consumer electronics release"@en .
+nexo:SoftwareRelease a owl:Class ;
+    rdfs:subClassOf nexo:TechnologyEvent ;
+    rdfs:label "Software Release"@en ;
+    rdfs:comment "Release of software, applications, or updates"@en ;
+    skos:example "Operating system release, app launch, software update"@en .
+nexo:TechnologyAnnouncement a owl:Class ;
+    rdfs:subClassOf nexo:TechnologyEvent ;
+    rdfs:label "Technology Announcement"@en ;
+    rdfs:comment "Major technology or innovation announcements"@en ;
+    skos:example "New technology reveal, breakthrough announcement"@en .
+# Awards
+nexo:RecognitionEvent a owl:Class ;
+    rdfs:subClassOf nexo:SimpleEvent ;
+    rdfs:label "Recognition Event"@en ;
+    rdfs:comment "Events conferring honors, awards, or recognition"@en .
+nexo:AwardCeremony a owl:Class ;
+    rdfs:subClassOf nexo:RecognitionEvent ;
+    rdfs:label "Award Ceremony"@en ;
+    rdfs:comment "Event where awards are presented"@en ;
+    skos:example "Oscars ceremony, Nobel Prize presentation, Grammy Awards"@en .
+nexo:PrizeAwarding a owl:Class ;
+    rdfs:subClassOf nexo:RecognitionEvent ;
+    rdfs:label "Prize Awarding"@en ;
+    rdfs:comment "Conferring of a prize or award to recipients"@en ;
+    skos:example "Nobel Prize, Pulitzer Prize, Fields Medal, Abel Prize"@en .
+nexo:HonoraryRecognition a owl:Class ;
+    rdfs:subClassOf nexo:RecognitionEvent ;
+    rdfs:label "Honorary Recognition"@en ;
+    rdfs:comment "Honorary degrees, titles, or distinctions"@en ;
+    skos:example "Honorary doctorate, knighthood, lifetime achievement award"@en .
+nexo:SportsAward a owl:Class ;
+    rdfs:subClassOf nexo:RecognitionEvent ;
+    rdfs:label "Sports Award"@en ;
+    rdfs:comment "Athletic achievements and awards"@en ;
+    skos:example "Olympic medal, championship title, MVP award, hall of fame induction"@en .
+# Elections
+nexo:ElectoralEvent a owl:Class ;
+    rdfs:subClassOf nexo:Event ;
+    rdfs:label "Electoral Event"@en ;
+    rdfs:comment "Events related to democratic elections and voting"@en .
+nexo:Election a owl:Class ;
+    rdfs:subClassOf nexo:ElectoralEvent, nexo:ComplexEvent ;
+    rdfs:label "Election"@en ;
+    rdfs:comment "Democratic selection of officials through voting process"@en ;
+    skos:example "Presidential election, parliamentary election, local election"@en .
+nexo:PresidentialElection a owl:Class ;
+    rdfs:subClassOf nexo:Election ;
+    rdfs:label "Presidential Election"@en ;
+    rdfs:comment "Election for head of state or head of government"@en .
+nexo:ParliamentaryElection a owl:Class ;
+    rdfs:subClassOf nexo:Election ;
+    rdfs:label "Parliamentary Election"@en ;
+    rdfs:comment "Election for legislative body members"@en .
+nexo:LocalElection a owl:Class ;
+    rdfs:subClassOf nexo:Election ;
+    rdfs:label "Local Election"@en ;
+    rdfs:comment "Municipal or regional elections"@en ;
+    skos:example "Mayoral election, city council election, gubernatorial election"@en .
+nexo:Referendum a owl:Class ;
+    rdfs:subClassOf nexo:ElectoralEvent, nexo:SimpleEvent ;
+    rdfs:label "Referendum"@en ;
+    rdfs:comment "Direct vote on a specific issue or policy"@en ;
+    skos:example "Brexit referendum, independence referendum, constitutional referendum"@en .
+# Diplomatic Events
+nexo:DiplomaticEvent a owl:Class ;
+    rdfs:subClassOf nexo:Event ;
+    rdfs:label "Diplomatic Event"@en ;
+    rdfs:comment "Events related to international relations and diplomacy"@en .
+nexo:TreatySigning a owl:Class ;
+    rdfs:subClassOf nexo:DiplomaticEvent, nexo:SimpleEvent ;
+    rdfs:label "Treaty Signing"@en ;
+    rdfs:comment "Formal signing of international agreements or treaties"@en ;
+    skos:example "Peace treaty, trade agreement, international accord"@en .
+nexo:PeaceTreaty a owl:Class ;
+    rdfs:subClassOf nexo:TreatySigning ;
+    rdfs:label "Peace Treaty"@en ;
+    rdfs:comment "Treaty ending hostilities or conflict"@en ;
+    skos:example "Treaty of Versailles, Good Friday Agreement, Dayton Accords"@en .
+nexo:TradeAgreement a owl:Class ;
+    rdfs:subClassOf nexo:TreatySigning ;
+    rdfs:label "Trade Agreement"@en ;
+    rdfs:comment "International trade and commerce agreements"@en ;
+    skos:example "NAFTA, EU trade deals, bilateral trade agreements"@en .
+nexo:InternationalAccord a owl:Class ;
+    rdfs:subClassOf nexo:TreatySigning ;
+    rdfs:label "International Accord"@en ;
+    rdfs:comment "Multilateral international agreements"@en ;
+    skos:example "Paris Climate Agreement, Geneva Conventions, UN treaties"@en .
+# ############################################################################
+# NEXO v1.2 — Mobility, Legislative, and refined Cultural / Sports branches
+# ############################################################################
+# ============================================
+# REPAIRS TO v1.1
+# ============================================
+# v1.1 restricted startDate/endDate to TemporalExtent, but the ontology's own
+# documentation and every downstream use attach them directly to the event.
+# Both patterns are now legal.
+nexo:startDate rdfs:domain [ a owl:Class ;
+        owl:unionOf ( nexo:Event nexo:TemporalExtent ) ] ;
+    rdfs:range [ a rdfs:Datatype ; owl:unionOf ( xsd:dateTime xsd:string ) ] ;
+    rdfs:comment """Range admits xsd:string as well as xsd:dateTime: corpora built
+    under a groundedness invariant carry verbatim surface forms ("this Saturday",
+    "am kommenden Sonntag") that cannot be normalised without leaving the source
+    text. Use nexo:normalizedStartDate for the resolved value."""@en  .
+nexo:normalizedStartDate a owl:DatatypeProperty ;
+    rdfs:subPropertyOf nexo:startDate ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "normalized start date"@en ;
+    rdfs:comment "Temporally resolved start, produced downstream of extraction."@en .
+nexo:normalizedEndDate a owl:DatatypeProperty ;
+    rdfs:subPropertyOf nexo:endDate ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "normalized end date"@en .
+nexo:endDate rdfs:domain [ a owl:Class ;
+        owl:unionOf ( nexo:Event nexo:TemporalExtent ) ] ;
+    rdfs:range [ a rdfs:Datatype ; owl:unionOf ( xsd:dateTime xsd:string ) ]  .
+nexo:actualAttendance a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range xsd:integer ;
+    rdfs:label "actual attendance"@en ;
+    rdfs:comment "Observed attendance figure."@en  .
+# Classes declared in v1.1 but never reachable by any property. Each now has
+# an incoming property rather than being deprecated, since the templates use them.
+nexo:hasRole a owl:ObjectProperty ;
+    rdfs:domain nexo:Participant ;
+    rdfs:range nexo:Role ;
+    rdfs:label "has role"@en ;
+    rdfs:comment "Links a participant to the role it holds in the event."@en .
+nexo:hasEventType a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:EventType ;
+    rdfs:label "has event type"@en .
+nexo:hasPerspective a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Perspective ;
+    rdfs:label "has perspective"@en .
+nexo:hasTrigger a owl:ObjectProperty ;
+    rdfs:domain nexo:ComplexEvent ;
+    rdfs:range nexo:Trigger ;
+    rdfs:label "has trigger"@en ;
+    rdfs:comment "Links a complex event to the catalysing event that initiated it."@en .
+nexo:hasMagnitude a owl:ObjectProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Magnitude ;
+    rdfs:label "has magnitude"@en ;
+    rdfs:comment """Reified magnitude, for events whose scale needs a unit or
+    scale name. The datatype property nexo:magnitude remains available for the
+    common unitless case."""@en .
+# nexo:SubEvent was never used: nexo:hasSubEvent ranges over nexo:Event, so any
+# event can be a sub-event. Retained but deprecated to avoid silent modelling drift.
+nexo:SubEvent owl:deprecated true ;
+    rdfs:comment "DEPRECATED in v1.2. Use nexo:hasSubEvent / nexo:partOf on nexo:Event directly."@en .
+# ============================================
+# SHARED SLOT PROPERTIES
+# ============================================
+nexo:eventDate a owl:DatatypeProperty ;
+    rdfs:subPropertyOf nexo:startDate ;
+    rdfs:domain nexo:Event ;
+    rdfs:range [ a rdfs:Datatype ; owl:unionOf ( xsd:dateTime xsd:string ) ] ;
+    rdfs:label "event date"@en ;
+    rdfs:comment """Date of a point-in-time event. Range is xsd:string rather
+    than xsd:dateTime because extraction yields surface forms lifted verbatim
+    from the source text ("this Saturday", "am kommenden Sonntag"); normalisation
+    to xsd:dateTime is a separate, downstream step."""@en  .
+nexo:duration a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range [ a rdfs:Datatype ; owl:unionOf ( xsd:decimal xsd:integer xsd:string ) ] ;
+    rdfs:label "duration"@en  .
+nexo:hasVenue a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasLocation ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Location ;
+    rdfs:label "has venue"@en  .
+nexo:city a owl:DatatypeProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( nexo:Event nexo:Location ) ] ;
+    rdfs:range xsd:string ;
+    rdfs:label "city"@en  .
+nexo:country a owl:DatatypeProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( nexo:Event nexo:Location ) ] ;
+    rdfs:range xsd:string ;
+    rdfs:label "country"@en  .
+nexo:hasOrganizer a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasAgent ;
+    rdfs:domain nexo:Event ;
+    rdfs:range nexo:Agent ;
+    rdfs:label "has organizer"@en  .
+nexo:contractValue a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ;
+    rdfs:range [ a rdfs:Datatype ; owl:unionOf ( xsd:decimal xsd:integer xsd:string ) ] ;
+    rdfs:label "contract value"@en ;
+    rdfs:comment "Monetary value of a contract, budget line or funding package attached to the event."@en  .
+# ============================================
+# CULTURAL BRANCH
+# ============================================
+nexo:CulturalEvent;
+    rdfs:comment "Events in the arts, heritage and literary sectors."@en .
+nexo:Exhibition a owl:Class ;
+    rdfs:subClassOf nexo:CulturalEvent ;
+    rdfs:label "Exhibition"@en ;
+    rdfs:comment "Presentation of visual or material works over a bounded period."@en ;
+    skos:example "Museum retrospective, group show, sculpture exhibition"@en .
+nexo:Concert a owl:Class ;
+    rdfs:subClassOf nexo:CulturalEvent ;
+    rdfs:label "Concert"@en ;
+    rdfs:comment "A live musical performance or performance series."@en ;
+    skos:example "Orchestral season opener, chamber recital, jazz residency, open-air concert"@en .
+nexo:StagePerformance a owl:Class ;
+    rdfs:subClassOf nexo:CulturalEvent ;
+    rdfs:label "Stage Performance"@en ;
+    rdfs:comment "Theatre, opera or dance performance."@en ;
+    skos:example "Theatre premiere, opera performance, dance premiere"@en .
+nexo:FestivalEdition a owl:Class ;
+    rdfs:subClassOf nexo:CulturalEvent , nexo:ComplexEvent ;
+    rdfs:label "Festival Edition"@en ;
+    rdfs:comment """One numbered edition of a recurring festival. Modelled as a
+    complex event because editions decompose into constituent performances,
+    screenings or openings."""@en ;
+    skos:example "Film festival opening, jazz festival, literature festival"@en .
+nexo:BookEvent a owl:Class ;
+    rdfs:subClassOf nexo:CulturalEvent ;
+    rdfs:label "Book Event"@en ;
+    rdfs:comment "Book fairs, launches and public readings."@en ;
+    skos:example "Frankfurt Book Fair opening, debut novel launch"@en .
+nexo:ArtistResidency a owl:Class ;
+    rdfs:subClassOf nexo:CulturalEvent ;
+    rdfs:label "Artist Residency"@en ;
+    rdfs:comment "An extended hosted engagement of an artist or ensemble by an institution."@en  .
+nexo:ProgrammeAnnouncement a owl:Class ;
+    rdfs:subClassOf nexo:CulturalEvent ;
+    rdfs:label "Programme Announcement"@en ;
+    rdfs:comment """Public announcement of a forthcoming programme or line-up.
+    Distinguished from the announced event itself, which may not yet exist."""@en  .
+nexo:hasArtist a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasParticipant ;
+    rdfs:domain nexo:CulturalEvent ; rdfs:range nexo:Participant ;
+    rdfs:label "has artist"@en  .
+nexo:hasPerformer a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasAgent ;
+    rdfs:domain nexo:CulturalEvent ; rdfs:range nexo:Agent ;
+    rdfs:label "has performer"@en  .
+nexo:hasCurator a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasAgent ;
+    rdfs:domain nexo:CulturalEvent ; rdfs:range nexo:Agent ;
+    rdfs:label "has curator"@en  .
+nexo:hasDirector a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasAgent ;
+    rdfs:domain nexo:CulturalEvent ; rdfs:range nexo:Agent ;
+    rdfs:label "has director"@en  .
+nexo:ticketPrice a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ; rdfs:range [ a rdfs:Datatype ; owl:unionOf ( xsd:decimal xsd:integer xsd:string ) ] ;
+    rdfs:label "ticket price"@en ;
+    rdfs:comment "Admission price for a single ticket. Distinct from nexo:ticketSales, which is aggregate revenue."@en  .
+nexo:edition a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ; rdfs:range [ a rdfs:Datatype ; owl:unionOf ( xsd:decimal xsd:integer xsd:string ) ] ;
+    rdfs:label "edition"@en ;
+    rdfs:comment "Ordinal or named edition of a recurring event, e.g. \"37th\", \"2026 edition\"."@en  .
+nexo:genre a owl:DatatypeProperty ;
+    rdfs:domain nexo:CulturalEvent ; rdfs:range xsd:string ;
+    rdfs:label "genre"@en  .
+nexo:medium a owl:DatatypeProperty ;
+    rdfs:domain nexo:CulturalEvent ; rdfs:range xsd:string ;
+    rdfs:label "medium"@en  .
+nexo:language a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ; rdfs:range xsd:string ;
+    rdfs:label "language"@en ;
+    rdfs:comment "Language in which the event is delivered. Not the language of the source document."@en  .
+# ============================================
+# SPORTS BRANCH — reconciles the ontology with the extraction templates
+# ============================================
+# v1.1 declared only nexo:SportsEvent, while the extraction templates referred
+# to TeamSportsEvent and IndividualSportsEvent. Those classes are introduced here.
+nexo:TeamSportsMatch a owl:Class ;
+    rdfs:subClassOf nexo:SportsEvent ;
+    rdfs:label "Team Sports Match"@en ;
+    rdfs:comment "A contest between two teams."@en ;
+    skos:example "League derby, cup semifinal, relegation playoff"@en .
+nexo:IndividualSportsMatch a owl:Class ;
+    rdfs:subClassOf nexo:SportsEvent ;
+    rdfs:label "Individual Sports Match"@en ;
+    rdfs:comment "A head-to-head contest between individual competitors."@en ;
+    skos:example "Tennis quarterfinal, fencing semifinal, wrestling championship bout"@en .
+nexo:SportsRace a owl:Class ;
+    rdfs:subClassOf nexo:SportsEvent ;
+    rdfs:label "Sports Race"@en ;
+    rdfs:comment "A timed or placed contest over a course among many competitors."@en ;
+    skos:example "Marathon finish, cycling stage, regatta final, championship swim"@en .
+nexo:homeTeam a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasAgent ;
+    rdfs:domain nexo:SportsEvent ; rdfs:range nexo:Agent ;
+    rdfs:label "home team"@en  .
+nexo:awayTeam a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasAgent ;
+    rdfs:domain nexo:SportsEvent ; rdfs:range nexo:Agent ;
+    rdfs:label "away team"@en  .
+nexo:winner a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasAgent ;
+    rdfs:domain nexo:Event ; rdfs:range nexo:Agent ;
+    rdfs:label "winner"@en  .
+nexo:loser a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasParticipant ;
+    rdfs:domain nexo:Event ; rdfs:range nexo:Participant ;
+    rdfs:label "loser"@en  .
+nexo:hasKeyPlayer a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasAgent ;
+    rdfs:domain nexo:SportsEvent ; rdfs:range nexo:Agent ;
+    rdfs:label "has key player"@en  .
+nexo:finalScore a owl:DatatypeProperty ;
+    rdfs:domain nexo:SportsEvent ; rdfs:range xsd:string ;
+    rdfs:label "final score"@en ;
+    rdfs:comment "Result as a surface string, e.g. \"3-3 (4-2 pens)\", preserving the source form."@en  .
+nexo:competitionName a owl:DatatypeProperty ;
+    rdfs:domain nexo:SportsEvent ; rdfs:range xsd:string ;
+    rdfs:label "competition name"@en  .
+nexo:competitionStage a owl:DatatypeProperty ;
+    rdfs:domain nexo:SportsEvent ; rdfs:range xsd:string ;
+    rdfs:label "competition stage"@en ;
+    rdfs:comment """Round within a competition: group, qualifier, knockout,
+    quarterfinal, semifinal, final, replay, playoff, relegation decider. Modelled
+    as a property rather than a subclass axis, since stage varies independently
+    of sport."""@en .
+nexo:sportType a owl:DatatypeProperty ;
+    rdfs:domain nexo:SportsEvent ; rdfs:range xsd:string ;
+    rdfs:label "sport type"@en  .
+# ============================================
+# MOBILITY BRANCH — new in v1.2
+# ============================================
+# No v1.1 class covered transit operations. Public transport is absent from
+# schema.org, SEM and LODE, which model journeys and services but not events in
+# the operation of a network.
+nexo:MobilityEvent a owl:Class ;
+    rdfs:subClassOf nexo:Event ;
+    rdfs:label "Mobility Event"@en ;
+    rdfs:comment """An event in the operation, disruption or development of a
+    public transport or road network."""@en ;
+    skos:example "Metro line closure, rail strike, tram extension approval, fare change"@en .
+nexo:ServiceDisruption a owl:Class ;
+    rdfs:subClassOf nexo:MobilityEvent ;
+    rdfs:label "Service Disruption"@en ;
+    rdfs:comment "A degradation, interruption or curtailment of scheduled service."@en  .
+nexo:ServiceSuspension a owl:Class ;
+    rdfs:subClassOf nexo:ServiceDisruption ;
+    rdfs:label "Service Suspension"@en ;
+    rdfs:comment "Complete cessation of service on a line or route for a bounded period."@en  .
+nexo:LineClosure a owl:Class ;
+    rdfs:subClassOf nexo:ServiceDisruption ;
+    rdfs:label "Line Closure"@en  .
+nexo:StationClosure a owl:Class ;
+    rdfs:subClassOf nexo:ServiceDisruption ;
+    rdfs:label "Station Closure"@en  .
+nexo:RoadClosure a owl:Class ;
+    rdfs:subClassOf nexo:ServiceDisruption ;
+    rdfs:label "Road Closure"@en ;
+    rdfs:comment """Closure of a road or street. Frequently co-occurs with a
+    cultural or sports event in the same passage, which is the principal source
+    of multi-domain records, since a road closure is typically reported in the
+    same passage as the event that caused it."""@en  .
+nexo:ServiceDiversion a owl:Class ;
+    rdfs:subClassOf nexo:ServiceDisruption ;
+    rdfs:label "Service Diversion"@en ;
+    rdfs:comment "Rerouting of a service away from its scheduled path, with service maintained."@en  .
+nexo:ServiceReduction a owl:Class ;
+    rdfs:subClassOf nexo:ServiceDisruption ;
+    rdfs:label "Service Reduction"@en ;
+    rdfs:comment "Reduced frequency or a thinned timetable, short of suspension."@en  .
+nexo:TransitLabourAction a owl:Class ;
+    rdfs:subClassOf nexo:MobilityEvent ;
+    rdfs:label "Transit Labour Action"@en ;
+    rdfs:comment "Industrial action by transport staff, or its aversion."@en  .
+nexo:TransitInfrastructureProject a owl:Class ;
+    rdfs:subClassOf nexo:MobilityEvent , nexo:ComplexEvent ;
+    rdfs:label "Transit Infrastructure Project"@en ;
+    rdfs:comment """Construction or expansion of network infrastructure. Complex,
+    because it decomposes into approval, construction-start, and opening
+    sub-events, which news coverage typically reports months apart."""@en  .
+nexo:ProjectApproval a owl:Class ;
+    rdfs:subClassOf nexo:TransitInfrastructureProject ;
+    rdfs:label "Project Approval"@en ;
+    rdfs:comment """Formal authorisation of an infrastructure project. Where the
+    approving body is a council or parliament, the same real-world occurrence is
+    also a nexo:DeliberativeVote; the two views are linked with nexo:triggers."""@en  .
+nexo:LineExtension a owl:Class ;
+    rdfs:subClassOf nexo:TransitInfrastructureProject ;
+    rdfs:label "Line Extension"@en  .
+nexo:LineOpening a owl:Class ;
+    rdfs:subClassOf nexo:MobilityEvent ;
+    rdfs:label "Line Opening"@en ;
+    rdfs:comment "Entry into service of a new line, station or through-service."@en  .
+nexo:ServiceEnhancement a owl:Class ;
+    rdfs:subClassOf nexo:MobilityEvent ;
+    rdfs:label "Service Enhancement"@en ;
+    rdfs:comment "Temporary or permanent increase in capacity, frequency or span of service."@en  .
+nexo:FareChange a owl:Class ;
+    rdfs:subClassOf nexo:MobilityEvent ;
+    rdfs:label "Fare Change"@en  .
+nexo:hasOperator a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasAgent ;
+    rdfs:domain nexo:MobilityEvent ; rdfs:range nexo:Agent ;
+    rdfs:label "has operator"@en ;
+    rdfs:comment "The transport undertaking or infrastructure manager responsible for the affected service."@en  .
+nexo:affectedLine a owl:DatatypeProperty ;
+    rdfs:domain nexo:MobilityEvent ; rdfs:range xsd:string ;
+    rdfs:label "affected line"@en ;
+    rdfs:comment "Identifier of a rail, metro or tram line affected. Repeated for each line."@en  .
+nexo:affectedRoute a owl:DatatypeProperty ;
+    rdfs:domain nexo:MobilityEvent ; rdfs:range xsd:string ;
+    rdfs:label "affected route"@en ;
+    rdfs:comment "Identifier of a bus or road route affected. Repeated for each route."@en  .
+nexo:estimatedAffectedPassengers a owl:DatatypeProperty ;
+    rdfs:subPropertyOf nexo:affectedPopulation ;
+    rdfs:domain nexo:MobilityEvent ; rdfs:range xsd:integer ;
+    rdfs:label "estimated affected passengers"@en  .
+nexo:disruptionReason a owl:DatatypeProperty ;
+    rdfs:domain nexo:MobilityEvent ; rdfs:range xsd:string ;
+    rdfs:label "disruption reason"@en ;
+    rdfs:comment """Stated cause: signalling fault, engineering works, overhead-line
+    failure, points failure, track damage, derailment, landslide, fire, water-main
+    rupture, crowd management. Complements nexo:hasCausality, which records only the
+    natural/anthropogenic distinction."""@en  .
+nexo:numberOfStations a owl:DatatypeProperty ;
+    rdfs:domain nexo:MobilityEvent ; rdfs:range xsd:integer ;
+    rdfs:label "number of stations"@en  .
+nexo:fareChangeAmount a owl:DatatypeProperty ;
+    rdfs:domain nexo:MobilityEvent ; rdfs:range [ a rdfs:Datatype ; owl:unionOf ( xsd:decimal xsd:integer xsd:string ) ] ;
+    rdfs:label "fare change amount"@en  .
+nexo:fleetSize a owl:DatatypeProperty ;
+    rdfs:domain nexo:MobilityEvent ; rdfs:range xsd:integer ;
+    rdfs:label "fleet size"@en  .
+# ============================================
+# LEGISLATIVE BRANCH — new in v1.2
+# ============================================
+# v1.1 covered elections and referendums but not the deliberative votes taken
+# by the assemblies those elections populate.
+nexo:LegislativeEvent a owl:Class ;
+    rdfs:subClassOf nexo:Event ;
+    rdfs:label "Legislative Event"@en ;
+    rdfs:comment "Events in the proceedings of a legislature or deliberative assembly."@en  .
+nexo:DeliberativeVote a owl:Class ;
+    rdfs:subClassOf nexo:LegislativeEvent , nexo:SimpleEvent ;
+    rdfs:label "Deliberative Vote"@en ;
+    rdfs:comment """A recorded vote by an assembly on a motion, bill, budget or
+    appointment. Distinct from nexo:Election, in which an electorate rather than
+    an assembly votes."""@en  .
+nexo:ParliamentaryVote a owl:Class ;
+    rdfs:subClassOf nexo:DeliberativeVote ;
+    rdfs:label "Parliamentary Vote"@en  .
+nexo:CouncilVote a owl:Class ;
+    rdfs:subClassOf nexo:DeliberativeVote ;
+    rdfs:label "Council Vote"@en ;
+    rdfs:comment "A vote in a municipal or regional council."@en  .
+nexo:BudgetVote a owl:Class ;
+    rdfs:subClassOf nexo:DeliberativeVote ;
+    rdfs:label "Budget Vote"@en ;
+    rdfs:comment "A vote on a budget, funding package or appropriation."@en  .
+nexo:MotionOfNoConfidence a owl:Class ;
+    rdfs:subClassOf nexo:DeliberativeVote ;
+    rdfs:label "Motion of No Confidence"@en ;
+    rdfs:comment "A censure or confidence motion against a government or officeholder."@en  .
+nexo:RatificationVote a owl:Class ;
+    rdfs:subClassOf nexo:DeliberativeVote ;
+    rdfs:label "Ratification Vote"@en ;
+    rdfs:comment """A vote to ratify an agreement already concluded elsewhere,
+    such as a coalition agreement or treaty."""@en  .
+nexo:votesInFavour a owl:DatatypeProperty ;
+    rdfs:domain nexo:DeliberativeVote ; rdfs:range xsd:integer ;
+    rdfs:label "votes in favour"@en  .
+nexo:votesAgainst a owl:DatatypeProperty ;
+    rdfs:domain nexo:DeliberativeVote ; rdfs:range xsd:integer ;
+    rdfs:label "votes against"@en  .
+nexo:abstentions a owl:DatatypeProperty ;
+    rdfs:domain nexo:DeliberativeVote ; rdfs:range xsd:integer ;
+    rdfs:label "abstentions"@en  .
+nexo:majority a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ; rdfs:range [ a rdfs:Datatype ; owl:unionOf ( xsd:decimal xsd:integer xsd:string ) ] ;
+    rdfs:label "majority"@en ;
+    rdfs:comment "The margin or the majority rule applied, e.g. \"absolute\", \"two-thirds\", \"12 votes\"."@en  .
+nexo:voteOutcome a owl:DatatypeProperty ;
+    rdfs:domain nexo:DeliberativeVote ; rdfs:range xsd:string ;
+    rdfs:label "vote outcome"@en ;
+    rdfs:comment """Whether the motion carried. Recoverable from the vote counts,
+    but recorded explicitly because passages often state the outcome without the
+    counts."""@en .
+nexo:hasKeyPolitician a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasAgent ;
+    rdfs:domain nexo:Event ; rdfs:range nexo:Agent ;
+    rdfs:label "has key politician"@en  .
+nexo:hasParty a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasParticipant ;
+    rdfs:domain nexo:Event ; rdfs:range nexo:CollectiveAgent ;
+    rdfs:label "has party"@en ;
+    rdfs:comment "A political party involved in the event."@en  .
+nexo:winningParty a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasParty ;
+    rdfs:domain nexo:Event ; rdfs:range nexo:CollectiveAgent ;
+    rdfs:label "winning party"@en  .
+nexo:losingParty a owl:ObjectProperty ;
+    rdfs:subPropertyOf nexo:hasParty ;
+    rdfs:domain nexo:Event ; rdfs:range nexo:CollectiveAgent ;
+    rdfs:label "losing party"@en  .
+nexo:policyTopic a owl:DatatypeProperty ;
+    rdfs:domain nexo:LegislativeEvent ; rdfs:range xsd:string ;
+    rdfs:label "policy topic"@en ;
+    rdfs:comment "Subject matter of the motion: transport, housing, culture, taxation, rezoning."@en  .
+nexo:voteShare a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ; rdfs:range xsd:decimal ;
+    rdfs:label "vote share"@en  .
+nexo:turnout a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ; rdfs:range xsd:decimal ;
+    rdfs:label "turnout"@en  .
+nexo:office a owl:DatatypeProperty ;
+    rdfs:domain nexo:Event ; rdfs:range xsd:string ;
+    rdfs:label "office"@en ;
+    rdfs:comment "The office contested, filled or vacated."@en  .
