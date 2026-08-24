@@ -51,7 +51,7 @@
     dcterms:issued "2023-01-01"^^xsd:date ;
     dcterms:modified "2026-08-24"^^xsd:date ;
     dcterms:publisher [ a foaf:Organization ;
-        foaf:name "MODUL Technology GmbH" ] ;
+        foaf:name "Modul Technology GmbH" ] ;
     dcterms:abstract """NEXO models events as they are reported in narrative
     text. It covers eighteen domain families and provides a shared spine for
     temporality, spatiality, participation, causality, composition and

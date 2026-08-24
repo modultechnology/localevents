@@ -22,6 +22,9 @@ an `xsd:dateTime`.
 |---|---|
 | `nexo.ttl` | The ontology. OWL 2, Turtle. Imports nothing. |
 | `nexo-documentation.html` | Generated reference documentation — open in a browser |
+| `nexo-shapes.ttl` | *Optional.* SHACL constraints for the four domain branches |
+| `gen_props_table.py` | Appends the per-class property reference to the generated docs |
+| `gen_shapes.py` | Regenerates the SHACL shapes from the ontology |
 | `README.md` | This file |
 
 ## Structure
@@ -101,7 +104,15 @@ Every change is a widening: nothing valid under 1.1 is invalid under 1.2.
 ```bash
 pip install pylode
 python3 -m pylode -p ontpub -o nexo-documentation.html nexo.ttl
+python3 gen_props_table.py nexo.ttl nexo-documentation.html nexo-documentation.html
 ```
+
+Both steps are needed. pyLODE lists only the axioms asserted *directly* on each
+class, which makes leaf classes look as though they have no properties —
+`nexo:Exhibition` declares none of its own but inherits 58. The second step
+appends a **Properties per Class** section resolving each class to its full
+inherited set. It is derived entirely from the `rdfs:domain` axioms in
+`nexo.ttl` and asserts nothing new; running pyLODE alone will silently drop it.
 
 pyLODE 3.6 crashes on `rdfs:Datatype` blank nodes that are unions rather than
 restrictions (it routes them to the restriction renderer, which returns `None`).
@@ -120,3 +131,29 @@ in `pylode/utils.py`, in `_bn_html` — send datatype nodes carrying
   license      = {CC-BY-4.0}
 }
 ```
+
+## Validating data
+
+`nexo.ttl` cannot express "an exhibition has no turnout". `rdfs:domain` is an
+inference rule — it licenses a property on a class, it never forbids one — and
+several properties (`turnout`, `winner`, `majority`, `office`) are declared on
+`nexo:Event` so the ontology does not mis-entail on real data. That makes them
+domain-applicable to every event class.
+
+`nexo-shapes.ttl` supplies the prohibition. Four `sh:closed` node shapes, one
+per domain branch, permitting the core event properties plus that branch's own:
+
+```bash
+pip install pyshacl
+pyshacl -s nexo-shapes.ttl -e nexo.ttl -df turtle mydata.ttl
+```
+
+**`-e nexo.ttl` is required.** `sh:targetClass` matches instances through
+`rdfs:subClassOf*`, so the validator needs the class hierarchy to know an
+`Exhibition` is a `CulturalEvent`. Without it no shape matches, every check is
+skipped, and the report reads `Conforms: True` for data that plainly is not —
+a silent failure.
+
+Keep the shapes out of any graph you reason over. OWL axioms are inference
+rules and SHACL shapes are validation rules; conflating them lets a reasoner
+draw conclusions from what were meant to be prohibitions.

@@ -1,0 +1,925 @@
+@prefix nexo: <http://modultech.eu/nexo/> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# ############################################################################
+# NEXO SHACL shapes
+#
+# OPTIONAL. Constraints, not ontology. Keep this file out of any graph you
+# reason over: OWL axioms are inference rules, SHACL shapes are validation
+# rules, and conflating them makes a reasoner draw conclusions from what were
+# meant to be prohibitions.
+#
+# These shapes are deliberately NARROWER than nexo.ttl's rdfs:domain axioms.
+# Properties such as turnout, winner, majority and office are declared on
+# nexo:Event so the ontology does not mis-entail on real data; that makes them
+# domain-applicable to every event class, Exhibition included. Domain cannot
+# express "an exhibition has no turnout" -- rdfs:domain licenses a property, it
+# never forbids one. That prohibition lives here.
+#
+# Each branch shape is sh:closed, so a property outside its allowed set is a
+# violation rather than silently accepted.
+#
+# USAGE -- the -e flag is not optional:
+#
+#   pyshacl -s nexo-shapes.ttl -e nexo.ttl -df turtle mydata.ttl
+#
+# sh:targetClass matches instances through rdfs:subClassOf*, so the validator
+# needs the class hierarchy to know that an Exhibition is a CulturalEvent.
+# Without -e, nothing matches, every shape is skipped, and the report says
+# "Conforms: True" for data that plainly does not. That failure is silent, so
+# always supply the ontology.
+# ############################################################################
+
+<http://modultech.eu/nexo/shapes> a owl:Ontology ;
+    rdfs:label "NEXO SHACL shapes"@en ;
+    owl:versionInfo "1.2" .
+
+
+# ============================================
+# CulturalEvent
+# ============================================
+
+nexo:CulturalEventShape a sh:NodeShape ;
+    sh:targetClass nexo:CulturalEvent ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type rdfs:label rdfs:comment rdfs:seeAlso owl:sameAs ) ;
+    sh:name "CulturalEvent shape" ;
+    sh:description "Permits the core event properties plus the CulturalEvent branch; anything else is a violation." ;
+    sh:property [
+        sh:path nexo:eventName ;
+    ] ;
+    sh:property [
+        sh:path nexo:description ;
+    ] ;
+    sh:property [
+        sh:path nexo:eventDate ;
+        sh:or ( [ sh:datatype xsd:dateTime ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:startDate ;
+        sh:or ( [ sh:datatype xsd:dateTime ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:endDate ;
+        sh:or ( [ sh:datatype xsd:dateTime ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:normalizedStartDate ;
+        sh:datatype xsd:dateTime ;
+    ] ;
+    sh:property [
+        sh:path nexo:normalizedEndDate ;
+        sh:datatype xsd:dateTime ;
+    ] ;
+    sh:property [
+        sh:path nexo:duration ;
+        sh:or ( [ sh:datatype xsd:decimal ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:isOngoing ;
+        sh:datatype xsd:boolean ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasLocation ;
+        sh:class nexo:Location ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasVenue ;
+        sh:class nexo:Location ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:city ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:country ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:occursIn ;
+        sh:class nexo:Region ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasSpatialExtent ;
+        sh:class nexo:SpatialExtent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasTemporalExtent ;
+        sh:class nexo:TemporalExtent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasParticipant ;
+        sh:class nexo:Participant ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasAgent ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasPatient ;
+        sh:class nexo:Patient ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasOrganizer ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasPerspective ;
+        sh:class nexo:Perspective ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasEventType ;
+        sh:class nexo:EventType ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasCausality ;
+        sh:class nexo:Causality ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasImpact ;
+        sh:class nexo:Impact ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasMagnitude ;
+        sh:class nexo:Magnitude ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:magnitude ;
+        sh:datatype xsd:decimal ;
+    ] ;
+    sh:property [
+        sh:path nexo:partOf ;
+        sh:class nexo:ComplexEvent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasSubEvent ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:precedes ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:follows ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:triggers ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:causedBy ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:actualAttendance ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:estimatedParticipants ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:language ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:edition ;
+        sh:or ( [ sh:datatype xsd:decimal ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:onPlanet ;
+        sh:class nexo:Planet ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasArtist ;
+        sh:class nexo:Participant ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasPerformer ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasCurator ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasDirector ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:genre ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:medium ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:ticketPrice ;
+        sh:or ( [ sh:datatype xsd:decimal ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:string ] ) ;
+    ] .
+
+
+# ============================================
+# SportsEvent
+# ============================================
+
+nexo:SportsEventShape a sh:NodeShape ;
+    sh:targetClass nexo:SportsEvent ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type rdfs:label rdfs:comment rdfs:seeAlso owl:sameAs ) ;
+    sh:name "SportsEvent shape" ;
+    sh:description "Permits the core event properties plus the SportsEvent branch; anything else is a violation." ;
+    sh:property [
+        sh:path nexo:eventName ;
+    ] ;
+    sh:property [
+        sh:path nexo:description ;
+    ] ;
+    sh:property [
+        sh:path nexo:eventDate ;
+        sh:or ( [ sh:datatype xsd:dateTime ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:startDate ;
+        sh:or ( [ sh:datatype xsd:dateTime ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:endDate ;
+        sh:or ( [ sh:datatype xsd:dateTime ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:normalizedStartDate ;
+        sh:datatype xsd:dateTime ;
+    ] ;
+    sh:property [
+        sh:path nexo:normalizedEndDate ;
+        sh:datatype xsd:dateTime ;
+    ] ;
+    sh:property [
+        sh:path nexo:duration ;
+        sh:or ( [ sh:datatype xsd:decimal ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:isOngoing ;
+        sh:datatype xsd:boolean ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasLocation ;
+        sh:class nexo:Location ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasVenue ;
+        sh:class nexo:Location ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:city ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:country ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:occursIn ;
+        sh:class nexo:Region ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasSpatialExtent ;
+        sh:class nexo:SpatialExtent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasTemporalExtent ;
+        sh:class nexo:TemporalExtent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasParticipant ;
+        sh:class nexo:Participant ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasAgent ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasPatient ;
+        sh:class nexo:Patient ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasOrganizer ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasPerspective ;
+        sh:class nexo:Perspective ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasEventType ;
+        sh:class nexo:EventType ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasCausality ;
+        sh:class nexo:Causality ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasImpact ;
+        sh:class nexo:Impact ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasMagnitude ;
+        sh:class nexo:Magnitude ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:magnitude ;
+        sh:datatype xsd:decimal ;
+    ] ;
+    sh:property [
+        sh:path nexo:partOf ;
+        sh:class nexo:ComplexEvent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasSubEvent ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:precedes ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:follows ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:triggers ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:causedBy ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:actualAttendance ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:estimatedParticipants ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:language ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:edition ;
+        sh:or ( [ sh:datatype xsd:decimal ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:onPlanet ;
+        sh:class nexo:Planet ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:homeTeam ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:awayTeam ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:winner ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:loser ;
+        sh:class nexo:Participant ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasKeyPlayer ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:finalScore ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:competitionName ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:competitionStage ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:sportType ;
+        sh:datatype xsd:string ;
+    ] .
+
+
+# ============================================
+# MobilityEvent
+# ============================================
+
+nexo:MobilityEventShape a sh:NodeShape ;
+    sh:targetClass nexo:MobilityEvent ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type rdfs:label rdfs:comment rdfs:seeAlso owl:sameAs ) ;
+    sh:name "MobilityEvent shape" ;
+    sh:description "Permits the core event properties plus the MobilityEvent branch; anything else is a violation." ;
+    sh:property [
+        sh:path nexo:eventName ;
+    ] ;
+    sh:property [
+        sh:path nexo:description ;
+    ] ;
+    sh:property [
+        sh:path nexo:eventDate ;
+        sh:or ( [ sh:datatype xsd:dateTime ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:startDate ;
+        sh:or ( [ sh:datatype xsd:dateTime ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:endDate ;
+        sh:or ( [ sh:datatype xsd:dateTime ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:normalizedStartDate ;
+        sh:datatype xsd:dateTime ;
+    ] ;
+    sh:property [
+        sh:path nexo:normalizedEndDate ;
+        sh:datatype xsd:dateTime ;
+    ] ;
+    sh:property [
+        sh:path nexo:duration ;
+        sh:or ( [ sh:datatype xsd:decimal ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:isOngoing ;
+        sh:datatype xsd:boolean ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasLocation ;
+        sh:class nexo:Location ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasVenue ;
+        sh:class nexo:Location ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:city ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:country ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:occursIn ;
+        sh:class nexo:Region ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasSpatialExtent ;
+        sh:class nexo:SpatialExtent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasTemporalExtent ;
+        sh:class nexo:TemporalExtent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasParticipant ;
+        sh:class nexo:Participant ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasAgent ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasPatient ;
+        sh:class nexo:Patient ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasOrganizer ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasPerspective ;
+        sh:class nexo:Perspective ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasEventType ;
+        sh:class nexo:EventType ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasCausality ;
+        sh:class nexo:Causality ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasImpact ;
+        sh:class nexo:Impact ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasMagnitude ;
+        sh:class nexo:Magnitude ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:magnitude ;
+        sh:datatype xsd:decimal ;
+    ] ;
+    sh:property [
+        sh:path nexo:partOf ;
+        sh:class nexo:ComplexEvent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasSubEvent ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:precedes ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:follows ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:triggers ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:causedBy ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:actualAttendance ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:estimatedParticipants ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:language ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:edition ;
+        sh:or ( [ sh:datatype xsd:decimal ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:onPlanet ;
+        sh:class nexo:Planet ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasOperator ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:affectedLine ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:affectedRoute ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:estimatedAffectedPassengers ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:disruptionReason ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:numberOfStations ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:fareChangeAmount ;
+        sh:or ( [ sh:datatype xsd:decimal ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:fleetSize ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:contractValue ;
+        sh:or ( [ sh:datatype xsd:decimal ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:string ] ) ;
+    ] .
+
+
+# ============================================
+# LegislativeEvent
+# ============================================
+
+nexo:LegislativeEventShape a sh:NodeShape ;
+    sh:targetClass nexo:LegislativeEvent ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type rdfs:label rdfs:comment rdfs:seeAlso owl:sameAs ) ;
+    sh:name "LegislativeEvent shape" ;
+    sh:description "Permits the core event properties plus the LegislativeEvent branch; anything else is a violation." ;
+    sh:property [
+        sh:path nexo:eventName ;
+    ] ;
+    sh:property [
+        sh:path nexo:description ;
+    ] ;
+    sh:property [
+        sh:path nexo:eventDate ;
+        sh:or ( [ sh:datatype xsd:dateTime ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:startDate ;
+        sh:or ( [ sh:datatype xsd:dateTime ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:endDate ;
+        sh:or ( [ sh:datatype xsd:dateTime ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:normalizedStartDate ;
+        sh:datatype xsd:dateTime ;
+    ] ;
+    sh:property [
+        sh:path nexo:normalizedEndDate ;
+        sh:datatype xsd:dateTime ;
+    ] ;
+    sh:property [
+        sh:path nexo:duration ;
+        sh:or ( [ sh:datatype xsd:decimal ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:isOngoing ;
+        sh:datatype xsd:boolean ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasLocation ;
+        sh:class nexo:Location ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasVenue ;
+        sh:class nexo:Location ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:city ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:country ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:occursIn ;
+        sh:class nexo:Region ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasSpatialExtent ;
+        sh:class nexo:SpatialExtent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasTemporalExtent ;
+        sh:class nexo:TemporalExtent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasParticipant ;
+        sh:class nexo:Participant ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasAgent ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasPatient ;
+        sh:class nexo:Patient ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasOrganizer ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasPerspective ;
+        sh:class nexo:Perspective ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasEventType ;
+        sh:class nexo:EventType ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasCausality ;
+        sh:class nexo:Causality ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasImpact ;
+        sh:class nexo:Impact ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasMagnitude ;
+        sh:class nexo:Magnitude ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:magnitude ;
+        sh:datatype xsd:decimal ;
+    ] ;
+    sh:property [
+        sh:path nexo:partOf ;
+        sh:class nexo:ComplexEvent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasSubEvent ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:precedes ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:follows ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:triggers ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:causedBy ;
+        sh:class nexo:Event ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:actualAttendance ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:estimatedParticipants ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:language ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:edition ;
+        sh:or ( [ sh:datatype xsd:decimal ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:onPlanet ;
+        sh:class nexo:Planet ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:votesInFavour ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:votesAgainst ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:abstentions ;
+        sh:datatype xsd:integer ;
+    ] ;
+    sh:property [
+        sh:path nexo:majority ;
+        sh:or ( [ sh:datatype xsd:decimal ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:string ] ) ;
+    ] ;
+    sh:property [
+        sh:path nexo:voteOutcome ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasKeyPolitician ;
+        sh:class nexo:Agent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:hasParty ;
+        sh:class nexo:CollectiveAgent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:winningParty ;
+        sh:class nexo:CollectiveAgent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:losingParty ;
+        sh:class nexo:CollectiveAgent ;
+        sh:nodeKind sh:BlankNodeOrIRI ;
+    ] ;
+    sh:property [
+        sh:path nexo:policyTopic ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:voteShare ;
+        sh:datatype xsd:decimal ;
+    ] ;
+    sh:property [
+        sh:path nexo:turnout ;
+        sh:datatype xsd:decimal ;
+    ] ;
+    sh:property [
+        sh:path nexo:office ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nexo:contractValue ;
+        sh:or ( [ sh:datatype xsd:decimal ] [ sh:datatype xsd:integer ] [ sh:datatype xsd:string ] ) ;
+    ] .
