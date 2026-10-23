@@ -43,6 +43,7 @@ in this repository:
 | Folder | What's in it |
 |---|---|
 | [`dataset/`](dataset/) | 1,983 annotated passages · 2,180 events · English + German |
+| [`generator/`](generator/) | dataset generator and validator |
 | [`ontology/`](ontology/) | NEXO v1.2 — the event ontology, plus generated HTML documentation |
 | [`models/`](models/) | Four evaluation notebooks, one per open-weight model |
 
